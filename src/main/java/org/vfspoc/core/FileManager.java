@@ -1,12 +1,12 @@
-package org.vfspoc;
+package org.vfspoc.core;
 
 import org.vfspoc.config.Parameter;
 import org.vfspoc.config.VFSConfig;
+import org.vfspoc.util.ValidationUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class FileManager {
 
@@ -16,20 +16,25 @@ public class FileManager {
         vfsConfig=new VFSConfig();
     }
 
-    public void addPath(String nom, Path path){
-        vfsConfig.addPath(nom,path,false);
+    public void addPath(String name, Path path){
+        ValidationUtils.checkNotEmpty(name,"Name is empty");
+        ValidationUtils.checkNotNull(path,"Path is null");
+        vfsConfig.addPath(name,path,false);
     }
 
-    public Parameter getPath(String nom){
-        return vfsConfig.getPath(nom);
+    public Parameter getPath(String name){
+        ValidationUtils.checkNotEmpty(name,"Name is empty");
+        return vfsConfig.getPath(name);
     }
 
     public void createFile(PathName file) throws IOException {
+        ValidationUtils.checkNotNull(file,"Path is null");
         Path p=getRealFile(file);
         Files.createFile(p);
     }
 
     private Path getRealFile(PathName file) {
+        ValidationUtils.checkNotNull(file,"Path is null");
         Parameter p=getPath(file.getName());
         ValidationUtils.checkNotNull(p,"PathName doesn't exist");
         Path path;

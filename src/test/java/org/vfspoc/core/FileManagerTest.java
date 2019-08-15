@@ -1,4 +1,4 @@
-package org.vfspoc;
+package org.vfspoc.core;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

@@ -1,4 +1,4 @@
-package org.vfspoc;
+package org.vfspoc.util;
 
 import org.vfspoc.exception.VFSInvalideParameterException;
 
