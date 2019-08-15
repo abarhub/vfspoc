@@ -22,6 +22,12 @@ public class FileManager {
         vfsConfig.addPath(name,path,false);
     }
 
+    public void addPathRealOnly(String name, Path path){
+        ValidationUtils.checkNotEmpty(name,"Name is empty");
+        ValidationUtils.checkNotNull(path,"Path is null");
+        vfsConfig.addPath(name,path,true);
+    }
+
     public Parameter getPath(String name){
         ValidationUtils.checkNotEmpty(name,"Name is empty");
         return vfsConfig.getPath(name);
