@@ -2,6 +2,7 @@ package org.vfspoc.core;
 
 import org.vfspoc.config.Parameter;
 import org.vfspoc.config.VFSConfig;
+import org.vfspoc.util.ConvertFile;
 import org.vfspoc.util.ValidationUtils;
 
 import java.io.IOException;
@@ -11,9 +12,13 @@ import java.nio.file.Path;
 public class FileManager {
 
     private VFSConfig vfsConfig;
+    private Command command;
+    private ConvertFile convertFile;
 
     public FileManager() {
         vfsConfig=new VFSConfig();
+        command=new Command(this);
+        convertFile=new ConvertFile(vfsConfig);
     }
 
     public void addPath(String name, Path path){
@@ -33,22 +38,12 @@ public class FileManager {
         return vfsConfig.getPath(name);
     }
 
-    public void createFile(PathName file) throws IOException {
+    protected Path getRealFile(PathName file) {
         ValidationUtils.checkNotNull(file,"Path is null");
-        Path p=getRealFile(file);
-        Files.createFile(p);
+        return convertFile.getRealFile(file);
     }
 
-    private Path getRealFile(PathName file) {
-        ValidationUtils.checkNotNull(file,"Path is null");
-        Parameter p=getPath(file.getName());
-        ValidationUtils.checkNotNull(p,"PathName doesn't exist");
-        Path path;
-        if(file.getPath()==null||file.getPath().isEmpty()){
-            path=p.getPath();
-        } else {
-            path=p.getPath().resolve(file.getPath());
-        }
-        return path;
+    public Command getCommand() {
+        return command;
     }
 }
