@@ -6,12 +6,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class Command {
-
-     private final FileManager fileManager;
+public class Command extends AbstractOperation {
 
     public Command(FileManager fileManager) {
-        this.fileManager = fileManager;
+        super(fileManager);
     }
 
     public void createFile(PathName file) throws IOException {
@@ -38,13 +36,10 @@ public class Command {
         Files.delete(p);
     }
 
-    public void deleteIfExists(PathName file) throws IOException {
+    public boolean deleteIfExists(PathName file) throws IOException {
         ValidationUtils.checkNotNull(file,"Path is null");
         Path p=getRealFile(file);
-        Files.deleteIfExists(p);
+        return Files.deleteIfExists(p);
     }
 
-    private Path getRealFile(PathName file){
-        return fileManager.getRealFile(file);
-    }
 }

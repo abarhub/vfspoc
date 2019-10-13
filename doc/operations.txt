@@ -1,0 +1,67 @@
+
+https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html
+
+***************
+liste des commandes :
+
+
+* modifications :
+copy
+createDirectories
+createDirectory
+createFile
+createLink
+createSymbolicLink
+createTempDirectory
+createTempFile
+delete
+deleteIfExists
+move
+write
+
+* lecture :
+exists
+find
+getFileStore
+isDirectory
+isRegularFile
+isSameFile
+isSymbolicLink
+isWritable
+lines
+list (directories)
+notExists
+probeContentType
+readAllBytes
+readAllLines
+readSymbolicLink
+size
+walk
+walkFileTree
+
+
+* ouverture flux :
+newBufferedReader
+newBufferedWriter
+newByteChannel
+newDirectoryStream
+newInputStream
+newOutputStream
+
+* utilitaires
+
+* attributs :
+setAttribute
+setLastModifiedTime
+setOwner
+setPosixFilePermissions
+getAttribute
+getFileAttributeView
+getLastModifiedTime
+getOwner
+getPosixFilePermissions
+isExecutable
+isHidden
+isReadable
+readAttributes
+

@@ -6,12 +6,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class Query {
-
-    private final FileManager fileManager;
+public class Query extends AbstractOperation {
 
     public Query(FileManager fileManager) {
-        this.fileManager = fileManager;
+        super(fileManager);
     }
 
     public boolean exists(PathName file) throws IOException {
@@ -20,7 +18,4 @@ public class Query {
         return Files.exists(p);
     }
 
-    private Path getRealFile(PathName file){
-        return fileManager.getRealFile(file);
-    }
 }
