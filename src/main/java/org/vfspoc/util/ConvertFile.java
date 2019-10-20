@@ -6,6 +6,8 @@ import org.vfspoc.core.PathName;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 
 public class ConvertFile {
 
@@ -37,6 +39,7 @@ public class ConvertFile {
      * @return
      */
     private Path removeReferenceParentInBegin(Path path) {
+        ValidationUtils.checkNotNull(path,"Path is null");
         boolean aucunTraitement;
         do {
             aucunTraitement=true;
@@ -47,5 +50,46 @@ public class ConvertFile {
             }
         } while(!aucunTraitement);
         return path;
+    }
+
+    public Optional<PathName> convertFromRealPath(Path file) {
+        ValidationUtils.checkNotNull(file,"Path is null");
+        List<String> nameList=vfsConfig.getNames();
+        if(nameList!=null&&!nameList.isEmpty()){
+            Path trouve=null;
+            PathName pathNameTrouve=null;
+            Path fileNormalized=file.normalize();
+            for(String name:nameList){
+                Parameter parameter=vfsConfig.getPath(name);
+                Path path = parameter.getPath();
+                if(fileNormalized.startsWith(path)){
+                    if(trouve==null){
+                        trouve=path;
+                        pathNameTrouve = createPathName(fileNormalized, name, path);
+                    } else {
+                        if(trouve.getNameCount()<path.getNameCount()){
+                            trouve=path;
+                            pathNameTrouve = createPathName(fileNormalized, name, path);
+                        }
+                    }
+                }
+            }
+            return Optional.ofNullable(pathNameTrouve);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private PathName createPathName(Path fileNormalized, String name, Path path) {
+        PathName pathNameTrouve;
+        Path p=path.relativize(fileNormalized);
+        pathNameTrouve=new PathName(name, p.toString());
+        return pathNameTrouve;
+    }
+
+    private Path getNormalizedPath(String path){
+        Path p=Paths.get(path).normalize();
+        p = removeReferenceParentInBegin(p);
+        return p;
     }
 }

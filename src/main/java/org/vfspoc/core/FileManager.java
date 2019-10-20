@@ -5,9 +5,8 @@ import org.vfspoc.config.VFSConfig;
 import org.vfspoc.util.ConvertFile;
 import org.vfspoc.util.ValidationUtils;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class FileManager {
 
@@ -45,5 +44,11 @@ public class FileManager {
 
     public Command getCommand() {
         return command;
+    }
+
+    public Optional<PathName> convertFromRealPath(Path file) {
+        ValidationUtils.checkNotNull(file,"Path is null");
+        return convertFile.convertFromRealPath(file);
+
     }
 }

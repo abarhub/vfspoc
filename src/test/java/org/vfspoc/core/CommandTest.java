@@ -1,15 +1,20 @@
 package org.vfspoc.core;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -131,10 +136,11 @@ class CommandTest {
         assertTrue(Files.exists(file));
 
         // methode testée
-        command.deleteIfExists(getPathName(filename));
+        boolean res = command.deleteIfExists(getPathName(filename));
 
         // vérifications
         assertFalse(Files.exists(file));
+        assertTrue(res);
     }
 
     @Test
@@ -144,10 +150,146 @@ class CommandTest {
         assertFalse(Files.exists(file));
 
         // methode testée
-        command.deleteIfExists(getPathName(filename));
+        boolean res = command.deleteIfExists(getPathName(filename));
 
         // vérifications
         assertFalse(Files.exists(file));
+        assertFalse(res);
+    }
+
+    @Test
+    void createLink() throws IOException {
+        final String link = "filelink";
+        final Path linkPath=directory.resolve(link);
+        final String target = "dirtarget";
+        final Path targetPath=directory.resolve(target);
+        final String contenuFichier = "abcaaa123";
+        Files.createFile(targetPath);
+        Files.write(targetPath, contenuFichier.getBytes(StandardCharsets.UTF_8));
+        assertFalse(Files.exists(linkPath));
+        assertTrue(Files.exists(targetPath));
+        assertTrue(Files.isRegularFile(targetPath));
+        assertArrayEquals(contenuFichier.getBytes(StandardCharsets.UTF_8),Files.readAllBytes(targetPath));
+
+        // methode testée
+        PathName res = command.createLink(getPathName(link), getPathName(target));
+
+        // vérifications
+        assertTrue(Files.exists(linkPath));
+        assertTrue(Files.exists(targetPath));
+        assertTrue(Files.isRegularFile(linkPath));
+        assertTrue(Files.isRegularFile(targetPath));
+        assertArrayEquals(contenuFichier.getBytes(StandardCharsets.UTF_8),Files.readAllBytes(linkPath));
+        assertArrayEquals(contenuFichier.getBytes(StandardCharsets.UTF_8),Files.readAllBytes(targetPath));
+        assertEquals(getPathName(link),res);
+    }
+
+    @Test
+    @Disabled("Les liens symboliques ne fonctionnent que si on est superadmin => test désactivé")
+    void createSymbolicLink() throws IOException {
+        final String link = "dirlink";
+        final Path linkPath=directory.resolve(link);
+        final String target = "dirtarget";
+        final Path targetPath=directory.resolve(target);
+        Files.createDirectory(targetPath);
+        assertFalse(Files.exists(linkPath));
+        assertTrue(Files.exists(targetPath));
+        assertTrue(Files.isDirectory(targetPath));
+
+        // methode testée
+        PathName res = command.createSymbolicLink(getPathName(link), getPathName(target));
+
+        // vérifications
+        assertTrue(Files.exists(linkPath));
+        assertTrue(Files.exists(targetPath));
+        assertTrue(Files.isSymbolicLink(linkPath));
+        assertTrue(Files.isDirectory(targetPath));
+        assertEquals(getPathName(link),res);
+    }
+
+    @Test
+    void copyInput() throws IOException {
+        final String contenu = "abc";
+        ByteArrayInputStream input=new ByteArrayInputStream(contenu.getBytes(StandardCharsets.UTF_8));
+        final String filename = "file1.txt";
+        PathName outputFile = getPathName(filename);
+
+        // methode testée
+        long res = command.copy(input,outputFile);
+
+        // vérifications
+        byte[] buf = Files.readAllBytes(directory.resolve(filename));
+        assertNotNull(buf);
+        assertArrayEquals(contenu.getBytes(StandardCharsets.UTF_8), buf);
+    }
+
+    @Test
+    void copyOutput() throws IOException {
+        final String contenu = "abc2";
+        final String filename = "file2.txt";
+        PathName inputFile = getPathName(filename);
+        Path input=directory.resolve(filename);
+        Files.write(input,contenu.getBytes(StandardCharsets.UTF_8));
+        assertTrue(Files.exists(input));
+        ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
+
+        // methode testée
+        long res = command.copy(inputFile, outputStream);
+
+        // vérifications
+        byte[] buf = outputStream.toByteArray();
+        assertNotNull(buf);
+        assertArrayEquals(contenu.getBytes(StandardCharsets.UTF_8), buf);
+    }
+
+    @Test
+    void copyFile() throws IOException {
+        final String contenu = "abc3";
+        final String filenameInput = "fileinput.txt";
+        final String filenameOutput = "fileoutput.txt";
+        PathName inputFile = getPathName(filenameInput);
+        Path input=directory.resolve(filenameInput);
+        Files.write(input,contenu.getBytes(StandardCharsets.UTF_8));
+        assertTrue(Files.exists(input));
+        PathName outputFile = getPathName(filenameOutput);
+        Path output=directory.resolve(filenameOutput);
+        assertFalse(Files.exists(output));
+
+        // methode testée
+        PathName res = command.copy(inputFile, outputFile);
+
+        // vérifications
+        assertTrue(Files.exists(input));
+        assertTrue(Files.exists(output));
+        byte[] buf = Files.readAllBytes(output);
+        assertNotNull(buf);
+        assertArrayEquals(contenu.getBytes(StandardCharsets.UTF_8), buf);
+        assertEquals(outputFile, res);
+    }
+
+    @Test
+    void move() throws IOException {
+        final String contenu = "abc4";
+        final String filenameInput = "fileinput2.txt";
+        final String filenameOutput = "fileoutput2.txt";
+        PathName inputFile = getPathName(filenameInput);
+        Path input=directory.resolve(filenameInput);
+        Files.write(input,contenu.getBytes(StandardCharsets.UTF_8));
+        assertTrue(Files.exists(input));
+        PathName outputFile = getPathName(filenameOutput);
+        Path output=directory.resolve(filenameOutput);
+        assertFalse(Files.exists(output));
+
+        // methode testée
+        PathName res = command.move(inputFile, outputFile);
+
+        // vérifications
+        assertFalse(Files.exists(input));
+        assertTrue(Files.exists(output));
+        byte[] buf = Files.readAllBytes(output);
+        assertNotNull(buf);
+        assertArrayEquals(contenu.getBytes(StandardCharsets.UTF_8), buf);
+        assertEquals(outputFile, res);
     }
 
     // methodes utilitaires

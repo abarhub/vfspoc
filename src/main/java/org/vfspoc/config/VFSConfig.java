@@ -3,8 +3,7 @@ package org.vfspoc.config;
 import org.vfspoc.util.ValidationUtils;
 
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class VFSConfig {
 
@@ -23,5 +22,18 @@ public class VFSConfig {
     public Parameter getPath(String name){
         ValidationUtils.checkNotEmpty(name,"Name is empty");
         return listeConfig.get(name);
+    }
+
+    public List<String> getNames(){
+        List<String> liste=new ArrayList<>();
+        liste.addAll(listeConfig.keySet());
+        return liste;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", VFSConfig.class.getSimpleName() + "[", "]")
+                .add("listeConfig=" + listeConfig)
+                .toString();
     }
 }

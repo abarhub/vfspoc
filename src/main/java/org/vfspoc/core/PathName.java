@@ -2,6 +2,11 @@ package org.vfspoc.core;
 
 import org.vfspoc.util.ValidationUtils;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
+import java.util.StringJoiner;
+
 public class PathName {
 
     private final String name;
@@ -28,5 +33,32 @@ public class PathName {
 
     public String getPath() {
         return path;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(name)
+                .append(":")
+                .append(path)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PathName pathName = (PathName) o;
+        if(!Objects.equals(name, pathName.name)) {
+            return false;
+        }
+        Path p=Paths.get(path);
+        Path p2=Paths.get(pathName.path);
+        return p.equals(p2);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, path);
     }
 }

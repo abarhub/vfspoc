@@ -6,16 +6,16 @@ liste des commandes :
 
 
 * modifications :
-copy
-createDirectories
-createDirectory
-createFile
-createLink
-createSymbolicLink
+copy *
+createDirectories *
+createDirectory *
+createFile *
+createLink *
+createSymbolicLink * (non testé car pb sous windows)
 createTempDirectory
 createTempFile
-delete
-deleteIfExists
+delete *
+deleteIfExists *
 move
 write
 

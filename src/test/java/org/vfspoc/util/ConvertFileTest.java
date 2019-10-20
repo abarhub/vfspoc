@@ -12,6 +12,7 @@ import org.vfspoc.core.PathName;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,7 +23,7 @@ class ConvertFileTest {
 
     @Test
     @DisplayName("getRealFile sur un fichier")
-    void getRealFile_test1() {
+    public void getRealFile_test1() {
         LOGGER.info("getRealFile_test1");
         VFSConfig vfsConfig;
         vfsConfig=new VFSConfig();
@@ -39,7 +40,7 @@ class ConvertFileTest {
 
     @Test
     @DisplayName("getRealFile sur un fichier dans un répertoire")
-    void getRealFile_test2() {
+    public void getRealFile_test2() {
         LOGGER.info("getRealFile_test2");
         VFSConfig vfsConfig;
         vfsConfig=new VFSConfig();
@@ -67,7 +68,7 @@ class ConvertFileTest {
     @ParameterizedTest
     @MethodSource("getRealFile_test3Parameter")
     @DisplayName("getRealFile sur un fichier dans un répertoire")
-    void getRealFile_test3(final String nameRef,final String pathRoot,final String path,final String pathRef) {
+    public void getRealFile_test3(final String nameRef,final String pathRoot,final String path,final String pathRef) {
         LOGGER.info("getRealFile_test3({},{},{},{})",nameRef, pathRoot, path, pathRef);
         VFSConfig vfsConfig;
         vfsConfig=new VFSConfig();
@@ -82,4 +83,83 @@ class ConvertFileTest {
         assertNotNull(pathRes);
         assertEquals(Paths.get(pathRef), pathRes);
     }
+
+    private static Stream<Arguments> convertFromRealPath_test() {
+        return Stream.of(
+                Arguments.of(Optional.of(createPathName("nom","bbb/ccc")), "/tmp/aaa/bbb/ccc",
+                        createVFSConfig("nom", "/tmp/aaa")),
+                Arguments.of(Optional.empty(), "/tmp/aaa2/bbb/ccc",
+                        createVFSConfig("nom", "/tmp/aaa")),
+                Arguments.of(Optional.of(createPathName("nom","bbb/ccc")), "/tmp/aaa/bbb/ccc",
+                        createVFSConfig("nom", "/tmp/aaa", "nom2", "/tmp/aaa2")),
+                Arguments.of(Optional.of(createPathName("nom2","bbb/ccc")), "/tmp/aaa2/bbb/ccc",
+                        createVFSConfig("nom", "/tmp/aaa", "nom2", "/tmp/aaa2")),
+                Arguments.of(Optional.of(createPathName("nom3","ccc")), "/tmp/aaa/bbb/ccc",
+                        createVFSConfig("nom", "/tmp/aaa", "nom2", "/tmp/aaa2", "nom3", "/tmp/aaa/bbb")),
+                Arguments.of(Optional.empty(), "/tmp/aaaa/bbb/ccc",
+                        createVFSConfig("nom", "/tmp/aaa", "nom2", "/tmp/aaa2")),
+                Arguments.of(Optional.of(createPathName("nom","aaa/bbb/ccc")), "/tmp/aaa/bbb/ccc",
+                        createVFSConfig("nom", "/tmp")),
+                Arguments.of(Optional.empty(), "/tmp/aaa",
+                        createVFSConfig("nom", "/tmp/aaa/bbb")),
+                Arguments.of(Optional.of(createPathName("nom","")), "/tmp/aaa",
+                        createVFSConfig("nom", "/tmp/aaa")),
+                Arguments.of(Optional.of(createPathName("nom","bbb/ccc")), "/tmp/aaa/ddd/../bbb/ccc",
+                        createVFSConfig("nom", "/tmp/aaa")),
+                Arguments.of(Optional.of(createPathName("nom","bbb/ccc")), "/tmp/ddd/../aaa/bbb/ccc",
+                        createVFSConfig("nom", "/tmp/aaa")),
+                Arguments.of(Optional.of(createPathName("nom","bbb/ccc")), "/tmp/aaa/./bbb/ccc",
+                        createVFSConfig("nom", "/tmp/aaa")),
+                Arguments.of(Optional.of(createPathName("nom","bbb/ccc")), "/tmp/./aaa/bbb/ccc",
+                        createVFSConfig("nom", "/tmp/aaa")),
+                Arguments.of(Optional.empty(), "/tmp/aaa/../../ggg",
+                        createVFSConfig("nom", "/tmp/aaa/bbb")),
+                Arguments.of(Optional.of(createPathName("nom","ggg")), "/tmp/aaa/bbb//ggg",
+                        createVFSConfig("nom", "/tmp/aaa/bbb")),
+                Arguments.of(Optional.of(createPathName("nom","ggg/hhh")), "/tmp/aaa/bbb/ggg//hhh",
+                        createVFSConfig("nom", "/tmp/aaa/bbb")),
+                Arguments.of(Optional.of(createPathName("nom","ggg")), "/tmp/aaa//bbb/ggg",
+                        createVFSConfig("nom", "/tmp/aaa/bbb"))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("convertFromRealPath_test")
+    @DisplayName("convertFromRealPath pour vérifier la convertion d'un chemin reel vers un PathName")
+    public void convertFromRealPath(Optional<PathName> pathRef, String path, VFSConfig vfsConfig){
+        LOGGER.info("convertFromRealPath({},{},{})",pathRef, path, vfsConfig);
+        ConvertFile convertFile=new ConvertFile(vfsConfig);
+
+        // methode testée
+        Optional<PathName> pathRes=convertFile.convertFromRealPath(Paths.get(path));
+
+        // vérifications
+        LOGGER.info("pathRes={}",pathRes);
+        assertEquals(pathRef, pathRes);
+    }
+
+    // methodes utilitaires
+
+    private static VFSConfig createVFSConfig(String... parameters){
+        VFSConfig vfsConfig;
+        vfsConfig=new VFSConfig();
+        if(parameters!=null&&parameters.length>0){
+            assertEquals(0, parameters.length%2);
+            for(int i=0;i<parameters.length;i+=2){
+                String nameRef=parameters[i];
+                String pathRoot=parameters[i+1];
+                assertNotNull(nameRef);
+                assertNotNull(pathRoot);
+                vfsConfig.addPath(nameRef, Paths.get(pathRoot),false);
+            }
+        }
+        return vfsConfig;
+    }
+
+    private static PathName createPathName(String name, String path){
+        assertNotNull(name);
+        assertNotNull(path);
+        return new PathName(name, path);
+    }
+
 }

@@ -1,6 +1,7 @@
 package org.vfspoc.core;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 public abstract class AbstractOperation {
 
@@ -16,5 +17,9 @@ public abstract class AbstractOperation {
 
     public FileManager getFileManager() {
         return fileManager;
+    }
+
+    protected Optional<PathName> convertFromRealPath(Path file) {
+        return fileManager.convertFromRealPath(file);
     }
 }
