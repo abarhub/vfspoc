@@ -16,7 +16,7 @@ createTempDirectory
 createTempFile
 delete *
 deleteIfExists *
-move
+move *
 write
 
 * lecture :
@@ -41,12 +41,12 @@ walkFileTree
 
 
 * ouverture flux :
-newBufferedReader
-newBufferedWriter
+newBufferedReader *
+newBufferedWriter *
 newByteChannel
 newDirectoryStream
-newInputStream
-newOutputStream
+newInputStream *
+newOutputStream *
 
 * utilitaires
 

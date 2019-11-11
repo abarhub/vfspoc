@@ -1,5 +1,7 @@
 package org.vfspoc.core;
 
+import org.vfspoc.util.DirectoryStreamPathName;
+
 import java.io.*;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.DirectoryStream;
@@ -42,8 +44,9 @@ public class Open extends AbstractOperation {
         return Files.newByteChannel(path,options,attrs);
     }
 
-    public DirectoryStream<Path> newDirectoryStream(PathName pathName, DirectoryStream.Filter<? super Path> filter) throws IOException {
+    public DirectoryStream<PathName> newDirectoryStream(PathName pathName, DirectoryStream.Filter<? super Path> filter) throws IOException {
         Path path=getRealFile(pathName);
-        return Files.newDirectoryStream(path, filter);
+        final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, filter);
+        return new DirectoryStreamPathName(directoryStream, getFileManager());
     }
 }

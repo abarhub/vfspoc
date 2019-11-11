@@ -12,12 +12,16 @@ public class FileManager {
 
     private VFSConfig vfsConfig;
     private Command command;
+    private Query query;
+    private Open open;
     private ConvertFile convertFile;
 
     public FileManager() {
         vfsConfig=new VFSConfig();
         command=new Command(this);
         convertFile=new ConvertFile(vfsConfig);
+        query=new Query(this);
+        open=new Open(this);
     }
 
     public void addPath(String name, Path path){
@@ -49,6 +53,13 @@ public class FileManager {
     public Optional<PathName> convertFromRealPath(Path file) {
         ValidationUtils.checkNotNull(file,"Path is null");
         return convertFile.convertFromRealPath(file);
+    }
 
+    public Query getQuery() {
+        return query;
+    }
+
+    public Open getOpen() {
+        return open;
     }
 }
