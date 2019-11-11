@@ -43,8 +43,8 @@ walkFileTree
 * ouverture flux :
 newBufferedReader *
 newBufferedWriter *
-newByteChannel
-newDirectoryStream
+newByteChannel *
+newDirectoryStream *
 newInputStream *
 newOutputStream *
 
