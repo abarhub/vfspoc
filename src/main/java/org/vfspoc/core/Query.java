@@ -1,5 +1,6 @@
 package org.vfspoc.core;
 
+import org.vfspoc.exception.VFSException;
 import org.vfspoc.util.ValidationUtils;
 
 import java.io.IOException;
@@ -88,5 +89,20 @@ public class Query extends AbstractOperation {
         ValidationUtils.checkNotNull(file,"Path is null");
         Path p=getRealFile(file);
         return Files.readAllLines(p, charset);
+    }
+
+    public long size(PathName file) throws IOException {
+        ValidationUtils.checkNotNull(file,"Path is null");
+        Path p=getRealFile(file);
+        return Files.size(p);
+    }
+
+    public Stream<PathName> list(PathName file) throws IOException {
+        ValidationUtils.checkNotNull(file,"Path is null");
+        Path p=getRealFile(file);
+        return Files.list(p)
+                .map(x -> getFileManager()
+                        .convertFromRealPath(x)
+                        .orElseThrow(() ->new VFSException("Invalid Path")));
     }
 }

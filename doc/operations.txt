@@ -29,13 +29,13 @@ isSameFile *
 isSymbolicLink *
 isWritable *
 lines *
-list (directories)
+list (directories) *
 notExists *
 probeContentType
 readAllBytes *
 readAllLines *
 readSymbolicLink
-size
+size *
 walk
 walkFileTree
 

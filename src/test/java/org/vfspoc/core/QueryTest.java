@@ -17,7 +17,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -342,6 +344,46 @@ class QueryTest {
 
         // vérifications
         assertEquals(lignes, res);
+    }
+
+    @Test
+    void size() throws IOException {
+
+        final String filename = "file2.txt";
+        final Path file=directory.resolve(filename);
+        final String contenu="abc123852";
+        Files.write(file, contenu.getBytes(StandardCharsets.UTF_8));
+
+        // methode testée
+        long res=query.size(getPathName(filename));
+
+        // vérifications
+        assertEquals(contenu.length(), res);
+    }
+
+    @Test
+    void list() throws IOException {
+
+        final String filename = "directory";
+        final Path file=directory.resolve(filename);
+        final List<String> files=liste("fichier1.txt","fichier2.pdf", "fichier3.jpg");
+        Set<PathName> set=new HashSet<>();
+        Files.createDirectory(file);
+        for(String s:files) {
+            Files.createFile(file.resolve(s));
+            set.add(getPathName(filename+File.separator+s));
+        }
+
+        // methode testée
+        try(Stream<PathName> res=query.list(getPathName(filename))) {
+
+            // vérifications
+            assertNotNull(res);
+            List<PathName> liste = res.collect(Collectors.toList());
+            assertEquals(3, liste.size());
+            Set<PathName> set2 = new HashSet<>(liste);
+            assertEquals(set, set2);
+        }
     }
 
     // methodes utilitaires
