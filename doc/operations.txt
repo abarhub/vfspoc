@@ -17,7 +17,7 @@ createTempFile
 delete *
 deleteIfExists *
 move *
-write
+write *
 
 * lecture :
 exists

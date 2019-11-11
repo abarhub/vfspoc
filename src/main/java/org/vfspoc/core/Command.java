@@ -5,8 +5,10 @@ import org.vfspoc.util.ValidationUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.util.NoSuchElementException;
@@ -94,6 +96,23 @@ public class Command extends AbstractOperation {
         Path sourcePath=getRealFile(source);
         Path targetPath=getRealFile(target);
         Path path = Files.move(sourcePath, targetPath, options);
+        return convertFromRealPath(path).orElseThrow(NoSuchElementException::new);
+    }
+
+    public PathName write(PathName source, byte[] bytes, OpenOption... options) throws IOException {
+        ValidationUtils.checkNotNull(source,"source is null");
+        ValidationUtils.checkNotNull(bytes,"bytes is null");
+        Path sourcePath=getRealFile(source);
+        Path path = Files.write(sourcePath, bytes, options);
+        return convertFromRealPath(path).orElseThrow(NoSuchElementException::new);
+    }
+
+    public PathName write(PathName source, Iterable<? extends CharSequence> lines, Charset cs, OpenOption... options) throws IOException {
+        ValidationUtils.checkNotNull(source,"source is null");
+        ValidationUtils.checkNotNull(lines,"lines is null");
+        ValidationUtils.checkNotNull(cs,"cs is null");
+        Path sourcePath=getRealFile(source);
+        Path path = Files.write(sourcePath, lines, cs, options);
         return convertFromRealPath(path).orElseThrow(NoSuchElementException::new);
     }
 }

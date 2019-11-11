@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -291,6 +293,47 @@ class CommandTest {
         assertArrayEquals(contenu.getBytes(StandardCharsets.UTF_8), buf);
         assertEquals(outputFile, res);
     }
+
+    @Test
+    void writeBytes() throws IOException {
+        final String contenu = "abc5";
+        final String filename = "file.txt";
+        final PathName inputFile = getPathName(filename);
+        final Path file=directory.resolve(filename);
+        assertFalse(Files.exists(file));
+
+        // methode testée
+        PathName res = command.write(inputFile, contenu.getBytes(StandardCharsets.UTF_8));
+
+        // vérifications
+        assertNotNull(res);
+        assertTrue(Files.exists(file));
+        byte[] buf = Files.readAllBytes(file);
+        assertArrayEquals(contenu.getBytes(StandardCharsets.UTF_8), buf);
+    }
+
+    @Test
+    void writeLines() throws IOException {
+        final String contenu = "abc6";
+        final List<String> lignesRef=new ArrayList<>();
+        lignesRef.add(contenu);
+        final String filename = "file2.txt";
+        final PathName inputFile = getPathName(filename);
+        final Path file=directory.resolve(filename);
+        assertFalse(Files.exists(file));
+
+        // methode testée
+        PathName res = command.write(inputFile, lignesRef, StandardCharsets.UTF_8);
+
+        // vérifications
+        assertNotNull(res);
+        assertTrue(Files.exists(file));
+        List<String> lignes2 = Files.readAllLines(file);
+        assertEquals(1, lignes2.size());
+        assertEquals(lignesRef, lignes2);
+
+    }
+
 
     // methodes utilitaires
 
