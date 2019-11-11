@@ -20,20 +20,20 @@ move *
 write *
 
 * lecture :
-exists
+exists *
 find
 getFileStore
-isDirectory
-isRegularFile
-isSameFile
-isSymbolicLink
-isWritable
-lines
+isDirectory *
+isRegularFile *
+isSameFile *
+isSymbolicLink *
+isWritable *
+lines *
 list (directories)
-notExists
+notExists *
 probeContentType
-readAllBytes
-readAllLines
+readAllBytes *
+readAllLines *
 readSymbolicLink
 size
 walk

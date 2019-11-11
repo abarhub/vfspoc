@@ -2,6 +2,7 @@ package org.vfspoc.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
@@ -187,7 +188,8 @@ class CommandTest {
     }
 
     @Test
-    @Disabled("Les liens symboliques ne fonctionnent que si on est superadmin => test désactivé")
+    @Disabled("Les liens symboliques ne fonctionnent sous windows que si on est superadmin => test désactivé")
+    @Tag("symbolicLink")
     void createSymbolicLink() throws IOException {
         final String link = "dirlink";
         final Path linkPath=directory.resolve(link);
