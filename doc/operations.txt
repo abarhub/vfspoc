@@ -51,7 +51,7 @@ newOutputStream *
 * utilitaires
 
 * attributs :
-setAttribute
+setAttribute *
 setLastModifiedTime
 setOwner
 setPosixFilePermissions

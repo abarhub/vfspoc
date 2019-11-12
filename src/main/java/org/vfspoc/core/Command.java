@@ -1,5 +1,6 @@
 package org.vfspoc.core;
 
+import org.vfspoc.exception.VFSInvalidPathException;
 import org.vfspoc.util.ValidationUtils;
 
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.util.NoSuchElementException;
+import java.util.function.Supplier;
 
 public class Command extends AbstractOperation {
 
@@ -55,7 +57,7 @@ public class Command extends AbstractOperation {
         Path p=getRealFile(file);
         Path targetPath=getRealFile(target);
         Path pathRes=Files.createLink(p, targetPath);
-        return convertFromRealPath(pathRes).orElseThrow(NoSuchElementException::new);
+        return convertFromRealPath(pathRes).orElseThrow(throwInvalidePath(pathRes));
     }
 
     public PathName createSymbolicLink(PathName link, PathName target, FileAttribute<?>... attrs) throws IOException {
@@ -64,7 +66,7 @@ public class Command extends AbstractOperation {
         Path p=getRealFile(link);
         Path targetPath=getRealFile(target);
         Path pathRes=Files.createSymbolicLink(p, targetPath, attrs);
-        return convertFromRealPath(pathRes).orElseThrow(NoSuchElementException::new);
+        return convertFromRealPath(pathRes).orElseThrow(throwInvalidePath(pathRes));
     }
 
     public long copy(InputStream input, PathName target, CopyOption... options) throws IOException {
@@ -87,7 +89,7 @@ public class Command extends AbstractOperation {
         Path sourcePath=getRealFile(source);
         Path targetPath=getRealFile(target);
         Path path = Files.copy(sourcePath, targetPath, options);
-        return convertFromRealPath(path).orElseThrow(NoSuchElementException::new);
+        return convertFromRealPath(path).orElseThrow(throwInvalidePath(path));
     }
 
     public PathName move(PathName source, PathName target, CopyOption... options) throws IOException {
@@ -96,7 +98,7 @@ public class Command extends AbstractOperation {
         Path sourcePath=getRealFile(source);
         Path targetPath=getRealFile(target);
         Path path = Files.move(sourcePath, targetPath, options);
-        return convertFromRealPath(path).orElseThrow(NoSuchElementException::new);
+        return convertFromRealPath(path).orElseThrow(throwInvalidePath(path));
     }
 
     public PathName write(PathName source, byte[] bytes, OpenOption... options) throws IOException {
@@ -104,7 +106,7 @@ public class Command extends AbstractOperation {
         ValidationUtils.checkNotNull(bytes,"bytes is null");
         Path sourcePath=getRealFile(source);
         Path path = Files.write(sourcePath, bytes, options);
-        return convertFromRealPath(path).orElseThrow(NoSuchElementException::new);
+        return convertFromRealPath(path).orElseThrow(throwInvalidePath(path));
     }
 
     public PathName write(PathName source, Iterable<? extends CharSequence> lines, Charset cs, OpenOption... options) throws IOException {
@@ -113,6 +115,10 @@ public class Command extends AbstractOperation {
         ValidationUtils.checkNotNull(cs,"cs is null");
         Path sourcePath=getRealFile(source);
         Path path = Files.write(sourcePath, lines, cs, options);
-        return convertFromRealPath(path).orElseThrow(NoSuchElementException::new);
+        return convertFromRealPath(path).orElseThrow(throwInvalidePath(path));
+    }
+
+    private Supplier<VFSInvalidPathException> throwInvalidePath(Path pathRes) {
+        return () -> new VFSInvalidPathException("Invalide Path", pathRes);
     }
 }

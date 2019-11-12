@@ -14,6 +14,7 @@ public class FileManager {
     private Command command;
     private Query query;
     private Open open;
+    private Search search;
     private ConvertFile convertFile;
 
     public FileManager() {
@@ -22,6 +23,7 @@ public class FileManager {
         convertFile=new ConvertFile(vfsConfig);
         query=new Query(this);
         open=new Open(this);
+        search=new Search(this);
     }
 
     public void addPath(String name, Path path){
@@ -61,5 +63,9 @@ public class FileManager {
 
     public Open getOpen() {
         return open;
+    }
+
+    public Search getSearch() {
+        return search;
     }
 }
