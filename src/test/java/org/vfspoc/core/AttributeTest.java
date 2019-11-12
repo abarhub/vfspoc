@@ -36,7 +36,7 @@ class AttributeTest {
 
     @BeforeEach
     void setUp(@TempDir Path tempDir) throws IOException {
-        fileManager=new FileManager();
+        //fileManager=new FileManager();
 
         assertTrue(Files.exists(tempDir));
         Path temp=tempDir.resolve("temp");

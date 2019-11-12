@@ -13,6 +13,10 @@ public class VFSConfig {
         listeConfig=new HashMap<>();
     }
 
+    public VFSConfig(Map<String,Parameter> listeConfig) {
+        this.listeConfig=new HashMap<>(listeConfig);
+    }
+
     public void addPath(String name, Path path,boolean readonly){
         ValidationUtils.checkNotEmpty(name,"Name is empty");
         ValidationUtils.checkNotNull(path,"Path is null");

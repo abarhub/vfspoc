@@ -26,6 +26,15 @@ public class FileManager {
         search=new Search(this);
     }
 
+    public FileManager(FileManagerBuilder fileManagerBuilder) {
+        vfsConfig=fileManagerBuilder.build();
+        command=new Command(this);
+        convertFile=new ConvertFile(vfsConfig);
+        query=new Query(this);
+        open=new Open(this);
+        search=new Search(this);
+    }
+
     public void addPath(String name, Path path){
         ValidationUtils.checkNotEmpty(name,"Name is empty");
         ValidationUtils.checkNotNull(path,"Path is null");
