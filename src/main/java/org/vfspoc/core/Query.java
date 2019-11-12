@@ -48,12 +48,6 @@ public class Query extends AbstractOperation {
         return Files.isSymbolicLink(p);
     }
 
-    public boolean isWritable(PathName file) {
-        ValidationUtils.checkNotNull(file,"Path is null");
-        Path p=getRealFile(file);
-        return Files.isWritable(p);
-    }
-
     public Stream<String> lines(PathName file) throws IOException {
         ValidationUtils.checkNotNull(file,"Path is null");
         Path p=getRealFile(file);

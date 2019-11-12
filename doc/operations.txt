@@ -27,7 +27,6 @@ isDirectory *
 isRegularFile *
 isSameFile *
 isSymbolicLink *
-isWritable *
 lines *
 list (directories) *
 notExists *
@@ -52,16 +51,17 @@ newOutputStream *
 
 * attributs :
 setAttribute *
-setLastModifiedTime
-setOwner
-setPosixFilePermissions
-getAttribute
-getFileAttributeView
-getLastModifiedTime
-getOwner
-getPosixFilePermissions
-isExecutable
-isHidden
-isReadable
-readAttributes
+setLastModifiedTime *
+setOwner *
+setPosixFilePermissions *
+getAttribute *
+getFileAttributeView *
+getLastModifiedTime *
+getOwner *
+getPosixFilePermissions *
+isExecutable *
+isHidden *
+isReadable *
+isWritable *
+readAttributes *
 

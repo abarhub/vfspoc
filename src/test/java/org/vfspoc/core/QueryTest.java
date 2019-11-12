@@ -206,37 +206,6 @@ class QueryTest {
     }
 
     @Test
-    void isWritableTrue() throws IOException {
-
-        final String filename = "file.txt";
-        final Path file=directory.resolve(filename);
-        Files.createFile(file);
-        assertTrue(Files.isWritable(file));
-
-        // methode testée
-        boolean res=query.isWritable(getPathName(filename));
-
-        // vérifications
-        assertTrue(res);
-    }
-
-    // TODO: trouver un moyen de créer un fichier non writable
-    @Test
-    @Disabled("TODO: trouver un moyen de créer un fichier non writable")
-    void isWritableFalse() throws IOException {
-        final String filename = "file.txt";
-        final Path file=directory.resolve(filename);
-        Files.createFile(file);
-        assertFalse(Files.isWritable(file));
-
-        // methode testée
-        boolean res=query.isWritable(getPathName(filename));
-
-        // vérifications
-        assertFalse(res);
-    }
-
-    @Test
     void lines() throws IOException {
 
         final String filename = "file.txt";
