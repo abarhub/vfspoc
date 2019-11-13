@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class DefaultFileManager {
 
@@ -19,26 +18,32 @@ public class DefaultFileManager {
 
     private static FileManager fileManager= createFileManager();
 
-    private static FileManager createFileManager() {
-        FileManagerBuilder fileManagerBuilder=new FileManagerBuilder();
-        Properties properties=null;
+    protected static FileManager createFileManager() {
+        FileManagerBuilder fileManagerBuilder;
 
-        // lecture du fichier de configuration dans le classpath
-        try(InputStream is = DefaultFileManager.class.getResourceAsStream("/vfs.properties")) {
-            properties = new Properties();
-            properties.load(is);
-        } catch (FileNotFoundException e) {
-            properties=null;
-            LOGGER.info("File vfs.properties not found in classpath");
-        } catch (IOException e) {
-            throw new VFSException("Error in reading file vfs.properties in classpath", e);
+        LOGGER.info("createFileManager");
+
+        Properties properties = getProperties();
+
+        if(properties!=null&&!properties.isEmpty()){
+            // construction de la map des propriétés (on enlève ce qui n'est pas de type string)
+            ParseConfigFile parseConfigFile=new ParseConfigFile();
+            fileManagerBuilder=parseConfigFile.parse(properties);
+        } else {
+            fileManagerBuilder=new FileManagerBuilder();
         }
+
+        return new FileManager(fileManagerBuilder);
+    }
+
+    private static Properties getProperties() {
+        Properties properties=null;
 
         if(properties==null) {
             // lecture du fichier de configuration dans la propriété VFS_CONFIG
             String vfsConfigPath = System.getProperty("VFS_CONFIG");
             if (vfsConfigPath != null && !vfsConfigPath.trim().isEmpty()) {
-                Path path = Path.of(vfsConfigPath);
+                Path path = Paths.get(vfsConfigPath);
                 if (Files.exists(path)) {
                     try (InputStream in = Files.newInputStream(path)) {
                         properties = new Properties();
@@ -52,53 +57,25 @@ public class DefaultFileManager {
             }
         }
 
-        if(properties!=null&&!properties.isEmpty()){
-            // construction de la map des propriétés (on enlève ce qui n'est pas de type string)
-            Set<Object> keys=properties.keySet();
-            Map<String, String> map=new HashMap<>();
-            for(Object o:keys){
-                if(o !=null&&o instanceof String){
-                    Object o2=properties.get(o);
-                    if(o2!=null&&o2 instanceof String){
-                        String key= (String) o;
-                        String value= (String) o2;
-                        map.put(key, value);
-                    }
+        if(properties==null) {
+            // lecture du fichier de configuration dans le classpath
+            try (InputStream is = DefaultFileManager.class.getResourceAsStream("/vfs.properties")) {
+                if(is!=null) {
+                    properties = new Properties();
+                    properties.load(is);
                 }
-            }
-            // détermination des noms
-            final String prefix = "vfs.";
-            final String suffix = ".path";
-            List<String> liste=map.keySet()
-                    .stream()
-                    .filter(x -> x.startsWith(prefix))
-                    .map(x -> x.substring(prefix.length()))
-                    .filter(x -> x.endsWith(suffix))
-                    .map(x -> x.substring(0, x.indexOf(suffix)))
-                    .filter(x -> !x.trim().isEmpty())
-                    .filter(x -> x.matches("[a-zA-Z]+"))
-                    .distinct()
-                    .collect(Collectors.toList());
-
-            // ajout des paths dans fileManagerBuilder
-            for(String nom:liste){
-                String key=prefix+nom+suffix;
-                if(map.containsKey(key)){
-                    String value=map.get(key);
-                    if(value==null||value.trim().isEmpty()){
-                        throw new VFSException("Path for '"+key+"' is empty");
-                    } else {
-                        Path p= Paths.get(value);
-                        fileManagerBuilder.addPath(nom, p, false);
-                    }
-                }
+            } catch (FileNotFoundException e) {
+                properties = null;
+                LOGGER.info("File vfs.properties not found in classpath");
+            } catch (IOException e) {
+                throw new VFSException("Error in reading file vfs.properties in classpath", e);
             }
         }
-
-        return new FileManager(fileManagerBuilder);
+        return properties;
     }
 
     public static FileManager get(){
         return fileManager;
     }
+
 }
